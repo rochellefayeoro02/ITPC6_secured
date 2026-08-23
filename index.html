@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f7f7f7;
+            color: #111;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 30px 15px;
+        }
+
+        .frame {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 35px;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+        }
+
+        h2 {
+            text-align: center;
+            margin: 0 0 30px;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #111;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border 0.2s ease;
+        }
+
+        input:focus {
+            border-color: #000;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            margin-top: 25px;
+            padding: 12px;
+            background: #111;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        input[type="submit"]:hover {
+            background: #333;
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .link a {
+            color: #111;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 450px) {
+            .frame {
+                padding: 25px 20px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="frame">
+        <h2>Student Registration</h2>
+
+      <form method="POST" action="regis.php">
+
+    <label>First Name:</label>
+    <input type="text" name="firstName" required>
+
+    <label>Middle Name:</label>
+    <input type="text" name="middleName">
+
+    <label>Last Name:</label>
+    <input type="text" name="lastName" required>
+
+    <label>Birthdate:</label>
+    <input type="date" name="birthDate" required>
+
+    <label>Address:</label>
+    <input type="text" name="address" required>
+
+    <label>Email:</label>
+    <input type="email" name="email" required>
+
+    <label>Mobile:</label>
+    <input type="text" name="mobile" required>
+
+    <label>Password:</label>
+    <input type="password" name="password" required>
+
+    <label>Confirm Password:</label>
+    <input type="password" name="confirm_password" required>
+
+    <input type="submit" name="register" value="Register">
+
+</form>
+
+        <div class="link">
+            Already registered?
+            <a href="login.php">Log in</a>
+        </div>
+
+    </div>
+
+</body>
+</html>
