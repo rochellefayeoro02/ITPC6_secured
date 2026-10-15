@@ -1,162 +1,74 @@
+<?php
+declare(strict_types=1);
+require __DIR__ . "/bootstrap.php";
+
+if (is_logged_in()) { header("Location: welcome.php"); exit; }
+
+// Errors / old input are passed from regis.php (never the password).
+$errors = $_SESSION["reg_errors"] ?? [];
+$old    = $_SESSION["reg_old"] ?? [];
+unset($_SESSION["reg_errors"], $_SESSION["reg_old"]);
+
+function old(array $old, string $k): string { return e($old[$k] ?? ""); }
+?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Student Registration</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #f7f7f7;
-            color: #111;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 30px 15px;
-        }
-
-        .frame {
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 35px;
-            width: 100%;
-            max-width: 400px;
-            border-radius: 8px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
-        }
-
-        h2 {
-            text-align: center;
-            margin: 0 0 30px;
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: #111;
-        }
-
-        label {
-            display: block;
-            margin: 15px 0 6px;
-            font-size: 13px;
-            font-weight: 500;
-            color: #444;
-        }
-
-        input[type="text"],
-        input[type="date"],
-        input[type="email"],
-        input[type="password"] {
-            width: 100%;
-            padding: 11px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: #fff;
-            font-size: 14px;
-            font-family: inherit;
-            outline: none;
-            transition: border 0.2s ease;
-        }
-
-        input:focus {
-            border-color: #000;
-        }
-
-        input[type="submit"] {
-            width: 100%;
-            margin-top: 25px;
-            padding: 12px;
-            background: #111;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        input[type="submit"]:hover {
-            background: #333;
-        }
-
-        .link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 13px;
-            color: #666;
-        }
-
-        .link a {
-            color: #111;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .link a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 450px) {
-            .frame {
-                padding: 25px 20px;
-            }
-
-            h2 {
-                font-size: 20px;
-            }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+<div class="frame wide">
+    <h2>Create an account</h2>
 
-    <div class="frame">
-        <h2>Student Registration</h2>
+    <?php if ($errors): ?>
+        <div class="msg err" role="alert">
+            <ul><?php foreach ($errors as $err): ?><li><?= e($err) ?></li><?php endforeach; ?></ul>
+        </div>
+    <?php endif; ?>
 
-      <form method="POST" action="regis.php">
+    <form method="POST" action="regis.php" autocomplete="on">
+        <?= csrf_field() ?>
 
-    <label>First Name:</label>
-    <input type="text" name="firstName" required>
-
-    <label>Middle Name:</label>
-    <input type="text" name="middleName">
-
-    <label>Last Name:</label>
-    <input type="text" name="lastName" required>
-
-    <label>Birthdate:</label>
-    <input type="date" name="birthDate" required>
-
-    <label>Address:</label>
-    <input type="text" name="address" required>
-
-    <label>Email:</label>
-    <input type="email" name="email" required>
-
-    <label>Mobile:</label>
-    <input type="text" name="mobile" required>
-
-    <label>Password:</label>
-    <input type="password" name="password" required>
-
-    <label>Confirm Password:</label>
-    <input type="password" name="confirm_password" required>
-
-    <input type="submit" name="register" value="Register">
-
-</form>
-
-        <div class="link">
-            Already registered?
-            <a href="login.php">Log in</a>
+        <div class="row">
+            <div>
+                <label for="firstName">First name</label>
+                <input type="text" id="firstName" name="firstName" maxlength="50" value="<?= old($old, "firstName") ?>" required autocomplete="given-name">
+            </div>
+            <div>
+                <label for="middleName">Middle name (optional)</label>
+                <input type="text" id="middleName" name="middleName" maxlength="50" value="<?= old($old, "middleName") ?>" autocomplete="additional-name">
+            </div>
         </div>
 
-    </div>
+        <label for="lastName">Last name</label>
+        <input type="text" id="lastName" name="lastName" maxlength="50" value="<?= old($old, "lastName") ?>" required autocomplete="family-name">
 
+        <label for="birthDate">Birth date</label>
+        <input type="date" id="birthDate" name="birthDate" max="<?= date("Y-m-d") ?>" value="<?= old($old, "birthDate") ?>" required autocomplete="bday">
+
+        <label for="address">Address</label>
+        <input type="text" id="address" name="address" maxlength="255" value="<?= old($old, "address") ?>" required autocomplete="street-address">
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" maxlength="254" value="<?= old($old, "email") ?>" required autocomplete="email">
+
+        <label for="mobile">Mobile number</label>
+        <input type="tel" id="mobile" name="mobile" maxlength="20" value="<?= old($old, "mobile") ?>" required autocomplete="tel">
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" minlength="8" maxlength="72" required autocomplete="new-password">
+        <div class="hint">At least 8 characters, with letters and numbers.</div>
+
+        <label for="confirm_password">Confirm password</label>
+        <input type="password" id="confirm_password" name="confirm_password" minlength="8" maxlength="72" required autocomplete="new-password">
+
+        <input type="submit" name="register" value="Register">
+    </form>
+
+    <div class="link">Already have an account? <a href="login.php">Log in</a></div>
+</div>
 </body>
 </html>
