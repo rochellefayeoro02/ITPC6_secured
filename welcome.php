@@ -1,118 +1,53 @@
 <?php
-session_start();
+declare(strict_types=1);
+require __DIR__ . "/bootstrap.php";
+require __DIR__ . "/db.php";
 
-if (!isset($_SESSION['email'])) {
+require_login();
+
+// Pages for logged-in users shouldn't be cached (stops the Back button showing them after logout).
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Pragma: no-cache");
+
+$stmt = $conn->prepare("SELECT firstName, middleName, lastName, email, mobile, birthDate FROM form WHERE id = ? LIMIT 1");
+$stmt->bind_param("i", $_SESSION["user_id"]);
+$stmt->execute();
+$user = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+$conn->close();
+
+if (!$user) { // account was deleted while logged in
+    destroy_session();
     header("Location: login.php");
-    exit();
+    exit;
 }
-?>
 
+$fullName = trim($user["firstName"] . " " . $user["middleName"] . " " . $user["lastName"]);
+$fullName = preg_replace('/\s+/', " ", $fullName);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Welcome</title>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            background: #f7f7f7;
-            font-family: Arial, sans-serif;
-            color: #222;
-        }
-
-        .frame {
-            width: 100%;
-            max-width: 450px;
-            background: #ffffff;
-            padding: 50px 40px;
-            text-align: center;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
-        }
-
-        .welcome-icon {
-            width: 50px;
-            height: 50px;
-            margin: 0 auto 25px;
-            border-radius: 50%;
-            background: #111;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
-
-        h2 {
-            font-size: 26px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #111;
-        }
-
-        p {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #666;
-        }
-
-        .btn {
-            display: block;
-            width: 100%;
-            margin-top: 30px;
-            padding: 13px;
-            background: #111;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.2s ease;
-        }
-
-        .btn:hover {
-            background: #333;
-        }
-
-        @media (max-width: 480px) {
-            .frame {
-                padding: 40px 25px;
-            }
-
-            h2 {
-                font-size: 23px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+<div class="frame">
+    <h2>Welcome, <?= e($user["firstName"]) ?>!</h2>
 
-    <div class="frame">
+    <dl class="profile">
+        <div><dt>Name</dt><dd><?= e($fullName) ?></dd></div>
+        <div><dt>Email</dt><dd><?= e($user["email"]) ?></dd></div>
+        <div><dt>Mobile</dt><dd><?= e($user["mobile"]) ?></dd></div>
+        <div><dt>Birth date</dt><dd><?= e(date("F j, Y", strtotime($user["birthDate"]))) ?></dd></div>
+    </dl>
 
-        <div class="welcome-icon">✓</div>
-
-        <h2>
-            Welcome!</h2>
-
-        <p>You have successfully logged in to your account.</p>
-
-        <a href="index.html" class="btn">Log out</a>
-
-    </div>
-
+    <form method="POST" action="logout.php">
+        <?= csrf_field() ?>
+        <button type="submit" class="btn">Log out</button>
+    </form>
+</div>
 </body>
 </html>
